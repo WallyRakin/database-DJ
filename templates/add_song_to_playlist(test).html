@@ -1,0 +1,363 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="d-flex justify-content-center h-100">
+    <h1>Add a song to {{ playlist.name }}</h1>
+</div>
+<div class="d-flex justify-content-center h-100">
+
+    <form id="searchbar">
+        <div class="search">
+            <input class="search_input" type="text" name="searchInput" placeholder="Search all songs...">
+            <button class="search_icon"><i class="fa fa-search"></i></button>
+
+        </div>
+    </form>
+</div>
+
+<div class="d-flex justify-content-center h-100">
+    <div id="suggestions">
+        <ul></ul>
+    </div>
+</div>
+
+<div class="d-flex justify-content-center h-100">
+    <div id="options" hidden>
+        <ul>
+            {% for song_id, form in forms.items() %}
+            <li id="{{song_id}}">
+                <div>
+                    <p>
+                        {{all_songs[song_id]['title']}} <small>by {{all_songs[song_id]['artist']}}</small>
+                    </p>
+                </div>
+                <form method="post" action="">
+                    {{ form.csrf_token }}
+                    <input id="id" name="id" type="hidden" value="{{ song_id }}">
+                    {% if song_id in current_songs%}
+                    <div class="btn btn-secondary">Added</div>
+                    {% else %}
+                    <button type="submit" class="button btn">
+                        <span class="button__text">Add Song</span>
+                    </button>
+                    {% endif %}
+                </form>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+
+
+
+
+<style>
+    .search {
+        margin-bottom: auto;
+        margin-top: auto;
+        height: 70px;
+        background-color: #a8a8a8;
+        border-radius: 40px;
+        padding: 10px;
+    }
+
+    .search_input {
+        color: white;
+        border: 0;
+        outline: 0;
+        background: none;
+        width: 0;
+        margin-top: 5px;
+        caret-color: transparent;
+        line-height: 40px;
+        transition: width 0.4s linear;
+    }
+
+    .search .search_input {
+        padding: 0 10px;
+        width: 550px;
+        caret-color: red;
+        transition: width 0.4s linear;
+    }
+
+    .search:hover>.search_icon {
+        background: red;
+        color: #000000;
+        cursor: pointer;
+    }
+
+    .search_icon {
+        height: 50px;
+        width: 50px;
+        float: right;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        color: white !important;
+        background-color: black;
+        border: #000000;
+    }
+
+    a:link {
+        text-decoration: none;
+    }
+</style>
+
+<style>
+    /* DELETE IN PRODUCTION */
+    #options {
+        margin-top: 10px;
+    }
+
+    #options ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        background-color: #fff;
+        width: 550px;
+    }
+
+    #options ul li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border: 1px solid #ddd;
+        box-shadow: 0px 0px 5px #ddd;
+        background-color: #fff;
+    }
+
+    #options ul li:hover {
+        background-color: #f0f0f0;
+    }
+
+
+    /* Styles for the div element */
+    #options ul li div.btn.btn-secondary {
+        width: 100px;
+        height: 30px;
+    }
+
+    #options ul li div.btn.btn-secondary,
+    #options ul li div.btn.btn-secondary:hover {
+        background-color: rgb(92, 98, 102);
+        border: none;
+        color: rgb(203, 199, 194);
+        box-shadow: none;
+        transition: none;
+        /* Assuming the default border width is 1px */
+    }
+</style>
+
+<style>
+    #suggestions {
+        margin-top: 10px;
+    }
+
+    #suggestions ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        background-color: #fff;
+        width: 550px;
+    }
+
+    #suggestions ul li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border: 1px solid #ddd;
+        box-shadow: 0px 0px 5px #ddd;
+        background-color: #fff;
+    }
+
+    #suggestions ul li:hover {
+        background-color: #f0f0f0;
+    }
+
+
+    /* Styles for the div element */
+    #suggestions ul li div.btn.btn-secondary {
+        width: 100px;
+        height: 30px;
+    }
+
+    #suggestions ul li div.btn.btn-secondary,
+    #suggestions ul li div.btn.btn-secondary:hover {
+        background-color: rgb(92, 98, 102);
+        border: none;
+        color: rgb(203, 199, 194);
+        box-shadow: none;
+        transition: none;
+        /* Assuming the default border width is 1px */
+    }
+</style>
+
+<style>
+    .button {
+        position: relative;
+        background: #009579;
+        border: none;
+        outline: none;
+        cursor: pointer;
+    }
+
+    .button {
+        background: #009579;
+        width: 100px;
+        height: 30px;
+    }
+
+    .button:active {
+        background: #007a63;
+    }
+
+    .button__text {
+        color: #ffffff;
+        transition: all 0.2s;
+    }
+
+    .button--loading .button__text {
+        visibility: hidden;
+        opacity: 0;
+    }
+
+    .button--loading::after {
+        content: "";
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto;
+        border: 4px solid transparent;
+        border-top-color: #ffffff;
+        border-radius: 50%;
+        animation: button-loading-spinner 1s ease infinite;
+    }
+
+    @keyframes button-loading-spinner {
+        from {
+            transform: rotate(0turn);
+        }
+
+        to {
+            transform: rotate(1turn);
+        }
+    }
+</style>
+
+<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.5.0/axios.min.js"></script>
+<script>
+    // itterate over all `#suggestions ul li form` SUGGESTIONS
+    // when submitted > loading screeen > prevent default > sumit ajax request with CSRF token > replace button with Added logo
+    const searchbar = document.querySelector('#searchbar');
+    const suggestionList = document.querySelector('#suggestions ul');
+    const optionList = document.querySelector('#options ul');
+    const addedTag = document.createElement('div');
+    addedTag.innerText = 'Added';
+    addedTag.className = 'btn btn-secondary';
+    window.addEventListener("load", async function () {
+        // Your code here will run once the DOM is fully loaded
+        // suggestions logic FIX LATER
+
+
+
+
+        let songs = await axios.get('/songs/info').then(res => { return res.data });
+        console.dir(songs)
+        // searchbar logic
+        searchbar.addEventListener('submit', e => { searchbarLogic(e, songs); });
+
+
+
+    });
+
+    function search(value, songs) {
+        // TODO
+
+        let results = [];
+        console.dir(songs)
+        songs.forEach(i => { if (i.title.toLowerCase().includes(value)) { results.push(i) } });
+        results.sort((a, b) => {
+            // If both start with the input string, compare normally
+            if (a.title.toLowerCase().startsWith(value) && b.title.toLowerCase().startsWith(value)) {
+                return a.title.localeCompare(b.title);
+            }
+            // If a starts with the input string, it should come first
+            if (a.title.toLowerCase().startsWith(value)) {
+                return -1;
+            }
+            // If b.title starts with the input string, it should come first
+            if (b.title.toLowerCase().startsWith(value)) {
+                return 1;
+            }
+            // If neither start with the input string, compare normally
+            return a.title.localeCompare(b.title);
+        });
+        return results;
+
+    }
+
+    function searchbarLogic(e, songs) {
+        e.preventDefault();
+        suggestionList.innerHTML = '';
+        let value = e.srcElement.querySelector('input')['value'];
+        let results = search(value, songs);
+        console.dir(results);
+        results.forEach(suggestion => { suggestionList.append(optionList.querySelector(`[id="${suggestion.id.toString()}"]`).cloneNode(true)); });
+
+        let suggestions = Array.from(document.querySelectorAll(`#suggestions ul li form`));
+        suggestions.forEach(form => {
+
+            let csrfToken = form.querySelector('#csrf_token').value;
+            let songId = form.querySelector('#id').value;
+            let submitButton = form.querySelector('button');
+
+            form.addEventListener('submit', e => { formLogic(e, csrfToken, songId, submitButton); });
+
+
+        });
+    };
+
+
+    function formLogic(e, csrfToken, songId, submitButton) {
+        e.preventDefault();
+        console.dir(submitButton);
+        if (!submitButton.classList.contains("button--loading")) {
+            submitButton.classList.add("button--loading");
+        };
+        setTimeout(() => {
+            axios.post(window.location.pathname, {
+                id: songId,
+                csrf_token: csrfToken
+            }, {
+                headers: {
+                    'X-CSRFToken': csrfToken
+                }
+            }).then(response => {
+                console.log(response.data);
+                if (response.data == "success") {
+                    submitButton.parentNode.replaceChild(addedTag.cloneNode(true), submitButton);
+                    let submitPrime = optionList.querySelector(`[id="${songId.toString()}"] form`);
+                    submitPrime.parentNode.replaceChild(addedTag.cloneNode(true), submitPrime);
+                }
+                else {
+                    submitButton.classList.remove("button--loading");
+                }
+            }).catch(error => {
+                submitButton.classList.remove("button--loading");
+                console.error('Error:', error);
+            });
+        }, 500);
+
+    };
+</script>
+{% endblock %}

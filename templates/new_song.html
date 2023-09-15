@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div>
+    <h1>New Song</h1>
+    <form method="POST">
+        {{ form.artist.label }} {{ form.artist }}
+        {{ form.title.label }} {{ form.title }}
+        {{ form.submit }}
+        {{ form.hidden_tag() }}
+    </form>
+</div>
+{% endblock %}
