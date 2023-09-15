@@ -13,7 +13,7 @@
   <h2>Songs in Playlist:</h2>
   <ul>
     {% for song in playlist.songs %}
-    <li>{{song.title}} <small>by: {{song.artist}}</small></li>
+    <li><a href="/songs/{{song.id}}">{{song.title}} <small>by: {{song.artist}}</small></a></li>
     {% endfor %}
   </ul>
 </div>
